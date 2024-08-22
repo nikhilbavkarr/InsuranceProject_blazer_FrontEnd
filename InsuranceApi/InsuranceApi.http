@@ -1,0 +1,7 @@
+@InsuranceApi_HostAddress = http://localhost:5264
+
+
+GET {{InsuranceApi_HostAddress}}/Policy/
+Accept: application/json
+
+###
