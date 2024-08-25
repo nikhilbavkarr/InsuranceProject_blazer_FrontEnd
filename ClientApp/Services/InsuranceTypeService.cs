@@ -23,27 +23,27 @@ namespace Client.Services
 
         public async Task<List<InsuranceTypeDto>> GetAll()
         {
-            return await httpClient.GetFromJsonAsync<List<InsuranceTypeDto>>("InsuranceType");
+            return await httpClient.GetFromJsonAsync<List<InsuranceTypeDto>>("InsuranceTypeContoller");
         }
 
         public async Task<InsuranceTypeDto> GetById(int id)
         {
-            return await httpClient.GetFromJsonAsync<InsuranceTypeDto>($"InsuranceType/{id}");
+            return await httpClient.GetFromJsonAsync<InsuranceTypeDto>($"InsuranceTypeContoller/{id}");
         }
 
         public async Task Add(InsuranceTypeDto employee)
         {
-            await httpClient.PostAsJsonAsync<InsuranceTypeDto>("InsuranceType", employee);
+            await httpClient.PostAsJsonAsync<InsuranceTypeDto>("InsuranceTypeContoller", employee);
         }
 
         public async Task DeleteById(int id)
         {
-            await httpClient.DeleteAsync($"InsuranceType/{id}");
+            await httpClient.DeleteAsync($"InsuranceTypeContoller/{id}");
         }
 
         public async Task Update(InsuranceTypeDto employee)
         {
-            await httpClient.PutAsJsonAsync<InsuranceTypeDto>("InsuranceType", employee);
+            await httpClient.PutAsJsonAsync<InsuranceTypeDto>("InsuranceTypeContoller", employee);
         }
     }
 }

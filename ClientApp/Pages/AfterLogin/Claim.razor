@@ -1,0 +1,269 @@
+﻿@page "/Claim/{PolicyHolderId:int}"
+@using InsuranceApi.DTOs
+@using ClientApp.Services
+@inject IHospitalDtoService hservice
+@inject IClaimDtoService Cservice
+@inject IPolicyHolderDtoService Pservice
+@inject IInsuredPolicyDtoService IPservice
+@inject IInsuredDtoService Iservice
+@inject IPolicyDtoService PolicyService
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+
+<h3 class="text-center text-primary mt-4">Submit a Claim</h3>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    @if (isClaimSubmitted)
+                    {
+                        <div class="alert alert-success text-center" role="alert">
+                            Claim successfully submitted! Redirecting to user page...
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-group">
+                            <label for="policyid">Policy Number:</label>
+                            <InputNumber @bind-Value="enteredPolicyid" id="policyid" class="form-control" @onkeypress="HandleKeyPress" />
+                            <button class="btn btn-primary mt-3" @onclick="CheckPolicyHolder">Verify Policy</button>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                @errorMessage
+                            </div>
+                        }
+
+                        @if (isSubmitting)
+                        {
+                            <div class="d-flex justify-content-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </div>
+                        }
+
+                        @if (isPolicyHolderValid)
+                        {
+                            <div class="card mt-4">
+                                <div class="card-header">
+                                    <h5 class="card-title text-center">Claim Details</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Verified Insurance Policy ID:</strong> @claim.InsuredPolicyId</p>
+                                    <p><strong>Policy Holder ID:</strong> @claim.PolicyHolderId</p>
+
+                                    <EditForm Model="claim" OnValidSubmit="SubmitClaimAsync">
+                                        <DataAnnotationsValidator />
+                                        <ValidationSummary />
+
+                                        <div class="form-group">
+                                            <label for="claimdate">Claim Date:</label>
+                                            <InputDate @bind-Value="claim.ClaimDate" id="claimdate" class="form-control" readonly />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="claimamount">Claim Amount:</label>
+                                            <InputNumber @bind-Value="claim.ClaimAmount" id="claimamount" class="form-control" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="documenttype">Document Type:</label>
+                                            <InputText @bind-Value="claim.DocumentType" id="documenttype" class="form-control" />
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="fileupload">Upload Document: format - filename_policyid_insuedpolicyid example : tabletbill_1_2</label>
+                                            <InputFile OnChange="HandleFileSelected" id="fileupload" class="form-control" />
+                                        </div>
+
+                                        @if (!string.IsNullOrEmpty(uploadMessage))
+                                        {
+                                            <div class="alert @((uploadMessage.Contains("successfully")) ? "alert-success" : "alert-danger")" role="alert">
+                                                @uploadMessage
+                                            </div>
+                                        }
+
+
+                                        <div class="form-group">
+                                            <label for="hospital">Select Hospital:</label>
+                                            <InputSelect @bind-Value="claim.HospitalId" id="hospital" class="form-control">
+                                                @foreach (var hospital in hospitals)
+                                                {
+                                                    <option value="@hospital.HospitalId">@hospital.Name</option>
+                                                }
+                                            </InputSelect>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary btn-block" disabled="@isSubmitting">Submit Claim</button>
+                                    </EditForm>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private ClaimDto claim = new ClaimDto();
+    private List<HospitalDto> hospitals = new List<HospitalDto>();
+    private List<InsuredPolicyDto> insuredPolicies = new List<InsuredPolicyDto>();
+    private bool isSubmitting = false;
+    private bool isClaimSubmitted = false;
+    private int enteredPolicyid = 0;
+    private bool isPolicyHolderValid = false;
+    private string errorMessage = string.Empty;
+    private string uploadMessage = string.Empty;
+    [Parameter]
+    public int PolicyHolderId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            hospitals = (await hservice.GetAll()).ToList();
+            claim.ClaimDate = DateTime.Today;
+
+            // Fetch insured policies related to the policy holder
+            var insureds = (await Iservice.GetAll())
+                            .Where(i => i.PolicyHolderId == PolicyHolderId)
+                            .ToList();
+
+            if (insureds.Any())
+            {
+                var insuredIds = insureds.Select(i => i.InsuredId).Distinct().ToList();
+                insuredPolicies = (await IPservice.GetAll())
+                                    .Where(ip => insuredIds.Contains(ip.InsuredId))
+                                    .ToList();
+            }
+            else
+            {
+                errorMessage = "No insured policies found for this policy holder.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to load hospitals or policies: {ex.Message}";
+        }
+    }
+
+    private async Task CheckPolicyHolder()
+    {
+        try
+        {
+            InsuredPolicyDto InsuredPolicy = insuredPolicies.FirstOrDefault(ip => ip.InsuredPolicyId == enteredPolicyid);
+            if (InsuredPolicy != null)
+            {
+                claim.PolicyHolderId = PolicyHolderId;
+                claim.InsuredPolicyId = InsuredPolicy.InsuredPolicyId;
+                claim.ClaimStatus = "pending";
+                claim.DispenseAmount = 0;
+
+                isPolicyHolderValid = true;
+                errorMessage = string.Empty;
+            }
+            else
+            {
+                isPolicyHolderValid = false;
+                errorMessage = "Invalid Policy Number. This policy does not belong to the specified Policy Holder.";
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            isPolicyHolderValid = false;
+            errorMessage = $"Policy not found. Please check the Policy Number: {ex.Message}";
+        }
+    }
+
+    private void HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            CheckPolicyHolder();
+        }
+    }
+
+    private async Task SubmitClaimAsync()
+    {
+        isSubmitting = true;
+        try
+        {
+            await Cservice.Add(claim);
+
+            isClaimSubmitted = true;
+            errorMessage = string.Empty;
+
+            // Wait for 3 seconds before redirecting
+            await Task.Delay(3000);
+
+            // Redirect to user page
+            Navigation.NavigateTo($"/YourPolicies/{PolicyHolderId}");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to submit claim: {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            var file = e.File;
+
+            if (file != null)
+            {
+                using var content = new MultipartFormDataContent();
+                using var stream = file.OpenReadStream(maxAllowedSize: 10_000_000); // Max size 10 MB
+                var streamContent = new StreamContent(stream);
+
+
+                streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+
+                // Add the file content to the form data
+                content.Add(streamContent, "file", file.Name);
+
+                // Post the form data to the Web API
+                var response = await Http.PostAsync("Upload/upload", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseData = await response.Content.ReadFromJsonAsync<Response>();
+                    if (responseData != null)
+                    {
+                        claim.DocumentPath = responseData.FilePath;
+                    }
+                    uploadMessage = "File uploadedSuccessfully";
+                }
+                else
+                {
+                    uploadMessage = "Failed to upload document.";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            uploadMessage = $"Failed to upload document: {ex.Message}";
+        }
+    }
+
+    public class Response
+    {
+        public string message { get; set; }
+        public string FilePath { get; set; }
+    }
+
+}

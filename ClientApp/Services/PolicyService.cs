@@ -23,27 +23,27 @@ namespace ClientApp.Services
 
         public async Task<List<PolicyDto>> GetAll()
         {
-            return await httpClient.GetFromJsonAsync<List<PolicyDto>>("Policy");
+            return await httpClient.GetFromJsonAsync<List<PolicyDto>>("PolicyContoller");
         }
 
         public async Task<PolicyDto> GetById(int id)
         {
-            return await httpClient.GetFromJsonAsync<PolicyDto>($"Policy/{id}");
+            return await httpClient.GetFromJsonAsync<PolicyDto>($"PolicyContoller/{id}");
         }
 
         public async Task Add(PolicyDto employee)
         {
-            await httpClient.PostAsJsonAsync<PolicyDto>("Policy", employee);
+            await httpClient.PostAsJsonAsync<PolicyDto>("PolicyContoller", employee);
         }
 
         public async Task Delete(int id)
         {
-            await httpClient.DeleteAsync($"Policy/{id}");
+            await httpClient.DeleteAsync($"PolicyContoller/{id}");
         }
 
         public async Task Update(PolicyDto employee)
         {
-            await httpClient.PutAsJsonAsync<PolicyDto>("Policy", employee);
+            await httpClient.PutAsJsonAsync<PolicyDto>("PolicyContoller", employee);
         }
     }
 }

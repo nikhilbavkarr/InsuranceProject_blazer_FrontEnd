@@ -23,12 +23,12 @@ namespace ClientApp.Services
 
         public async Task<List<InsuredDto>> GetAll()
         {
-            return await httpClient.GetFromJsonAsync<List<InsuredDto>>("Insured");
+            return await httpClient.GetFromJsonAsync<List<InsuredDto>>("InsuredContoller");
         }
 
         public async Task<InsuredDto> GetById(int id)
         {
-            return await httpClient.GetFromJsonAsync<InsuredDto>($"Insured/{id}");
+            return await httpClient.GetFromJsonAsync<InsuredDto>($"InsuredContoller/{id}");
         }
 
         public async Task Add(InsuredDto employee)

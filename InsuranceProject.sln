@@ -5,7 +5,7 @@ VisualStudioVersion = 17.10.35027.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClientApp", "ClientApp\ClientApp.csproj", "{CE4E699C-C595-407F-B1CD-4BE823FAA453}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedModels", "SharedModels\SharedModels.csproj", "{F7F15CFB-6A83-4911-A8B1-2455700C4A68}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharedModels", "SharedModels\SharedModels.csproj", "{F7F15CFB-6A83-4911-A8B1-2455700C4A68}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InsuranceApi", "InsuranceApi\InsuranceApi.csproj", "{F30C12C3-2497-410A-B3DC-E46A238CD5F0}"
 EndProject

@@ -7,24 +7,62 @@
     </div>
 </div>
 
+
+
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-    </nav>
+    @if (isAuthenticated)
+    {
+        <nav class="flex-column">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/User">
+                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> User
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/Plans">
+
+                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span>Plans
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/YourPolicies/{PolicyHolderId:int}">
+
+                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span>YourPolicy
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/ContactUs">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Contact Us
+                </NavLink>
+            </div>
+        </nav>
+    }
+    else
+    {
+        <nav class="flex-column">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/">
+                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span>Home
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/Plans">
+
+                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span>Plans
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/Login">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Login/Register
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/ContactUs">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Contact Us
+                </NavLink>
+            </div>
+        </nav>
+    }
 </div>
 
 @code {
@@ -36,4 +74,6 @@
     {
         collapseNavMenu = !collapseNavMenu;
     }
+    private bool isAuthenticated = true; // Hard-coded for demonstration
 }
+

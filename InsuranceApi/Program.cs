@@ -36,6 +36,17 @@ namespace InsuranceApi
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
+			builder.Services.AddDirectoryBrowser();
+
+			builder.Services.AddCors(setup =>
+			{
+				setup.AddPolicy("cors", setup =>
+				{
+					setup.AllowAnyHeader();
+					setup.AllowAnyMethod();
+					setup.AllowAnyOrigin();
+				});
+			});
 
 			var app = builder.Build();
 
@@ -46,9 +57,14 @@ namespace InsuranceApi
 				app.UseSwaggerUI();
 			}
 
-			app.UseAuthorization();
+			app.UseCors("cors");
+			
+			app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseDirectoryBrowser();
+            app.UseAuthorization();
 
-
+			
 			app.MapControllers();
 
 			app.Run();

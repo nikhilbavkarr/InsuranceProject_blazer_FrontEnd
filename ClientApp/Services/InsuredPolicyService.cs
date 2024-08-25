@@ -23,12 +23,12 @@ namespace ClientApp.Services
 
         public async Task<List<InsuredPolicyDto>> GetAll()
         {
-            return await httpClient.GetFromJsonAsync<List<InsuredPolicyDto>>("InsuredPolicy");
+            return await httpClient.GetFromJsonAsync<List<InsuredPolicyDto>>("InsuredPolicyContoller");
         }
 
         public async Task<InsuredPolicyDto> GetById(int id)
         {
-            return await httpClient.GetFromJsonAsync<InsuredPolicyDto>($"InsuredPolicy/{id}");
+            return await httpClient.GetFromJsonAsync<InsuredPolicyDto>($"InsuredPolicyContoller/{id}");
         }
 
         public async Task Add(InsuredPolicyDto employee)
@@ -38,12 +38,12 @@ namespace ClientApp.Services
 
         public async Task DeleteById(int id)
         {
-            await httpClient.DeleteAsync($"InsuredPolicy/{id}");
+            await httpClient.DeleteAsync($"InsuredPolicyContoller/{id}");
         }
 
         public async Task Update(InsuredPolicyDto employee)
         {
-            await httpClient.PutAsJsonAsync<InsuredPolicyDto>("InsuredPolicy", employee);
+            await httpClient.PutAsJsonAsync<InsuredPolicyDto>("InsuredPolicyContoller", employee);
         }
     }
 }

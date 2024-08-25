@@ -1,6 +1,7 @@
 ﻿using InsuranceApi.Data;
 using InsuranceApi.DTOs;
 using InsuranceApi.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,9 +16,10 @@ namespace InsuranceApi.Controllers
         Task<IActionResult> GetById(int id);
         Task<IActionResult> Update(ClaimDto claimDto);
     }
-
+    [EnableCors("cors")]
     [Route("api/[controller]")]
     [ApiController]
+    
     public class ClaimController : ControllerBase, IClaimController
     {
         private readonly IClaimService service;
